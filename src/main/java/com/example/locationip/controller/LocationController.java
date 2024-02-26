@@ -1,7 +1,7 @@
 package com.example.locationip.controller;
 
 import com.example.locationip.service.LocationService;
-import com.example.locationip.Location;
+import com.example.locationip.model.Location;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;

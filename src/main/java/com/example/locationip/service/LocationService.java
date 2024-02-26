@@ -1,6 +1,6 @@
 package com.example.locationip.service;
 
-import com.example.locationip.Location;
+import com.example.locationip.model.Location;
 import org.springframework.stereotype.Service;
 
 @Service
