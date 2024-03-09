@@ -88,7 +88,6 @@ public class LocationController {
 
             return ResponseEntity.ok("Tag added to location successfully");
         } catch (Exception e) {
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to add tag to location");
         }
     }
@@ -128,7 +127,6 @@ public class LocationController {
 
             return ResponseEntity.ok("Tag unlinked to location successfully");
         } catch (Exception e) {
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to unlink tag to location");
         }
     }
