@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -21,5 +22,5 @@ public class Tag {
     private String name;
     @JsonIgnore
     @ManyToMany(mappedBy = "tags")
-    private List<Location> locations;
+    private List<Location> locations = new ArrayList<>();
 }

@@ -4,8 +4,8 @@ import jakarta.persistence.*;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Table;
 import lombok.*;
-import org.hibernate.annotations.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -25,10 +25,9 @@ public class Location {
     private String city;
 
     @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<IP> ips;
+    private List<IP> ips = new ArrayList<>();
 
     @ManyToMany()
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinTable(name = "locatio_tags", joinColumns = @JoinColumn(name = "location_id"), inverseJoinColumns = @JoinColumn(name = "tags_id"))
-    private List<Tag> tags;
+    private List<Tag> tags = new ArrayList<>();
 }

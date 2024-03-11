@@ -13,7 +13,7 @@ import java.util.List;
 public class IPController {
     private final IPService ipService;
 
-    public IPController(IPService ipService) {
+    public IPController(IPService ipService){
         this.ipService = ipService;
     }
 
@@ -22,11 +22,10 @@ public class IPController {
         if (ipService.existsByAddress(ip.getAddress())) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("IP with the given address already exists.");
         }
-        IP newIP = new IP();
-        newIP.setAddress(ip.getAddress());
         ipService.saveIP(ip);
         return ResponseEntity.status(HttpStatus.CREATED).body("IP created successfully.");
     }
+
 
     @GetMapping("/{id}")
     public IP getIPById(@PathVariable Long id) {

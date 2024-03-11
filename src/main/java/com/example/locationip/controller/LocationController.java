@@ -45,13 +45,25 @@ public class LocationController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @PostMapping
-    public ResponseEntity<String> createLocation(@RequestBody Location location) {
-        if (locationService.existsById(location.getId())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Location with the given ID already exists.");
+    @PostMapping("/post/{ipId}/{tagId}")
+    public ResponseEntity<String> createLocation(@RequestBody Location location, @PathVariable Long ipId, @PathVariable Long tagId) {
+        try {
+            Tag tag = tagService.getTagById(tagId);
+            IP ip = ipService.getIPById(ipId);
+            if (tag != null && ip != null) {
+                location.getIps().add(ip);
+                ip.setLocation(location);
+                location.getTags().add(tag);
+                tag.getLocations().add(location);
+                locationService.saveLocation(location);
+                tagService.saveTag(tag);
+                return ResponseEntity.status(HttpStatus.CREATED).body("Location created successfully.");
+            } else {
+                return ResponseEntity.status(HttpStatus.CREATED).body("Bad IP or tag.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to add location");
         }
-        locationService.saveLocation(location);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Location created successfully.");
     }
 
     @PutMapping("/linkIP/{locationId}/{ipId}")
