@@ -46,7 +46,7 @@ public class LocationController {
     }
 
     @PostMapping("/post/{ipId}/{tagId}")
-    public ResponseEntity<String> createLocation(@RequestBody Location location, @PathVariable Long ipId, @PathVariable Long tagId) {
+    public ResponseEntity<String> createLinkedLocation(@RequestBody Location location, @PathVariable Long ipId, @PathVariable Long tagId) {
         try {
             Tag tag = tagService.getTagById(tagId);
             IP ip = ipService.getIPById(ipId);
@@ -62,6 +62,17 @@ public class LocationController {
                 return ResponseEntity.status(HttpStatus.CREATED).body("Bad IP or tag.");
             }
         } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to add location");
+        }
+    }
+
+    @PostMapping()
+    public ResponseEntity<String> createLocation(@RequestBody Location location) {
+        try {
+            locationService.saveLocation(location);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Location created successfully.");
+        } catch (
+                Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to add location");
         }
     }

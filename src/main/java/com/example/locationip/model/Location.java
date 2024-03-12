@@ -1,8 +1,6 @@
 package com.example.locationip.model;
 
 import jakarta.persistence.*;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Table;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -19,8 +17,10 @@ public class Location {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "location_generator")
     private Long id;
+
     @Column(name = "country")
     private String country;
+
     @Column(name = "city")
     private String city;
 
