@@ -145,7 +145,10 @@ public class LocationController {
         if (!locationService.existsById(id)) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Requested location don't exist");
         }
+        Location oldLocation = locationService.getLocationById(id);
         location.setId(id);
+        location.setIps(oldLocation.getIps());
+        location.setTags(oldLocation.getTags());
         locationService.saveLocation(location);
         return ResponseEntity.ok("Location has been changed");
     }

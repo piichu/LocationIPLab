@@ -45,7 +45,9 @@ public class IPController {
         if (!ipService.existsById(id)) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Requested IP don't exist");
         }
+        IP oldIP = getIPById(id);
         ip.setId(id);
+        ip.setLocation(oldIP.getLocation());
         ipService.saveIP(ip);
         return ResponseEntity.ok("IP has been changed");
     }

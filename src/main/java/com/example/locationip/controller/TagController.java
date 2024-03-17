@@ -38,7 +38,9 @@ public class TagController {
 
     @PutMapping("/{id}")
     public Tag updateTag(@PathVariable Long id, @RequestBody Tag tag) {
+        Tag oldTag = getTagById(id);
         tag.setId(id);
+        tag.setLocations(oldTag.getLocations());
         return tagService.saveTag(tag);
     }
 
