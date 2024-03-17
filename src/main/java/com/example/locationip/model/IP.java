@@ -1,6 +1,6 @@
 package com.example.locationip.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,7 +18,7 @@ public class IP {
     private String address;
 
     @ManyToOne
-    @JsonIgnore
+    @JsonIgnoreProperties({"ips","tags"})
     @JoinColumn(name = "locationId")
     private Location location;
 }

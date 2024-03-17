@@ -13,7 +13,7 @@ import java.util.List;
 public class IPController {
     private final IPService ipService;
 
-    public IPController(IPService ipService){
+    public IPController(IPService ipService) {
         this.ipService = ipService;
     }
 
@@ -26,10 +26,13 @@ public class IPController {
         return ResponseEntity.status(HttpStatus.CREATED).body("IP created successfully.");
     }
 
-
     @GetMapping("/{id}")
     public IP getIPById(@PathVariable Long id) {
-        return ipService.getIPById(id);
+        if (ipService.existsById(id)) {
+            return ipService.getIPById(id);
+        }else{
+            return new IP();
+        }
     }
 
     @GetMapping

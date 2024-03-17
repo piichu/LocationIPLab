@@ -1,6 +1,6 @@
 package com.example.locationip.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,7 +20,7 @@ public class Tag {
 
     @Column(name = "name")
     private String name;
-    @JsonIgnore
+    @JsonIgnoreProperties({"tags","ips"})
     @ManyToMany(mappedBy = "tags")
     private List<Location> locations = new ArrayList<>();
 }

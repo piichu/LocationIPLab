@@ -1,5 +1,6 @@
 package com.example.locationip.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,10 +25,12 @@ public class Location {
     @Column(name = "city")
     private String city;
 
+    @JsonIgnoreProperties("location")
     @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<IP> ips = new ArrayList<>();
 
-    @ManyToMany()
+    @JsonIgnoreProperties("locations")
+    @ManyToMany(cascade = CascadeType.PERSIST)
     @JoinTable(name = "locatio_tags", joinColumns = @JoinColumn(name = "location_id"), inverseJoinColumns = @JoinColumn(name = "tags_id"))
     private List<Tag> tags = new ArrayList<>();
 }

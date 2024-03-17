@@ -1,11 +1,7 @@
 package com.example.locationip.controller;
 
-import com.example.locationip.model.IP;
-import com.example.locationip.model.Tag;
-import com.example.locationip.service.IPService;
-import com.example.locationip.service.LocationService;
-import com.example.locationip.model.Location;
-import com.example.locationip.service.TagService;
+import com.example.locationip.model.*;
+import com.example.locationip.service.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +20,6 @@ public class LocationController {
         this.ipService = ipService;
         this.tagService = tagService;
     }
-
 
     @GetMapping
     public List<Location> getAllLocations() {
@@ -56,7 +51,6 @@ public class LocationController {
                 location.getTags().add(tag);
                 tag.getLocations().add(location);
                 locationService.saveLocation(location);
-                tagService.saveTag(tag);
                 return ResponseEntity.status(HttpStatus.CREATED).body("Location created successfully.");
             } else {
                 return ResponseEntity.status(HttpStatus.CREATED).body("Bad IP or tag.");
@@ -71,8 +65,7 @@ public class LocationController {
         try {
             locationService.saveLocation(location);
             return ResponseEntity.status(HttpStatus.CREATED).body("Location created successfully.");
-        } catch (
-                Exception e) {
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to add location");
         }
     }
@@ -88,7 +81,6 @@ public class LocationController {
             ip.setLocation(location);
             location.getIps().add(ip);
             locationService.saveLocation(location);
-            ipService.saveIP(ip);
             return ResponseEntity.ok("IP successfully added to location.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to add ip to location");
@@ -107,8 +99,6 @@ public class LocationController {
             location.getTags().add(tag);
             tag.getLocations().add(location);
             locationService.saveLocation(location);
-            tagService.saveTag(tag);
-
             return ResponseEntity.ok("Tag added to location successfully");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to add tag to location");
@@ -126,7 +116,6 @@ public class LocationController {
             ip.setLocation(null);
             location.getIps().remove(ip);
             locationService.saveLocation(location);
-            ipService.saveIP(ip);
             return ResponseEntity.ok("IP successfully unlinked to location.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to unlink ip to location");
@@ -139,15 +128,12 @@ public class LocationController {
         try {
             Location location = locationService.getLocationById(locationId);
             Tag tag = tagService.getTagById(tagId);
-
             if (location == null || tag == null) {
                 return ResponseEntity.notFound().build();
             }
             location.getTags().remove(tag);
             tag.getLocations().remove(location);
             locationService.saveLocation(location);
-            tagService.saveTag(tag);
-
             return ResponseEntity.ok("Tag unlinked to location successfully");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to unlink tag to location");
