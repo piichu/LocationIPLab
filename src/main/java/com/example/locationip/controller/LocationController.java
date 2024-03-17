@@ -40,7 +40,7 @@ public class LocationController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @PostMapping("/post/{ipId}/{tagId}")
+    @PostMapping("/linked/{ipId}/{tagId}")
     public ResponseEntity<String> createLinkedLocation(@RequestBody Location location, @PathVariable Long ipId, @PathVariable Long tagId) {
         try {
             Tag tag = tagService.getTagById(tagId);

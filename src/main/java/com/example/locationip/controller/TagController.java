@@ -37,11 +37,14 @@ public class TagController {
     }
 
     @PutMapping("/{id}")
-    public Tag updateTag(@PathVariable Long id, @RequestBody Tag tag) {
+    public ResponseEntity<String> updateTag(@PathVariable Long id, @RequestBody Tag tag) {
+        if (!tagService.existsById(id)) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Requested tag don't exist");
+        }
         Tag oldTag = getTagById(id);
         tag.setId(id);
         tag.setLocations(oldTag.getLocations());
-        return tagService.saveTag(tag);
+        return ResponseEntity.ok("Tag has been changed");
     }
 
     @DeleteMapping("/{id}")
