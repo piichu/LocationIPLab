@@ -1,7 +1,11 @@
 package com.example.locationip.controller;
 
-import com.example.locationip.model.*;
-import com.example.locationip.service.*;
+import com.example.locationip.model.IP;
+import com.example.locationip.model.Location;
+import com.example.locationip.model.Tag;
+import com.example.locationip.service.IPService;
+import com.example.locationip.service.LocationService;
+import com.example.locationip.service.TagService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,10 +38,10 @@ public class LocationController {
     @GetMapping("/ip")
     public ResponseEntity<Location> getLocationByIP(@RequestParam String address) {
         Location newLocation = locationService.getLocationByIP(ipService.getIPByAddress(address));
-        if (newLocation != null) {
-            return ResponseEntity.ok(newLocation);
+        if (newLocation == null) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return ResponseEntity.ok(newLocation);
     }
 
     @PostMapping("/linked/{ipId}/{tagId}")

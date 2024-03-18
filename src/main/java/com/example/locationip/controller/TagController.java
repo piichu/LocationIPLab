@@ -18,7 +18,7 @@ public class TagController {
     }
 
     @PostMapping
-    public ResponseEntity<String> createIP(@RequestBody Tag tag) {
+    public ResponseEntity<String> createTag(@RequestBody Tag tag) {
         if (tagService.existsById(tag.getId())) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Tag with the given ID already exists.");
         }
