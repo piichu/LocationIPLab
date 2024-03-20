@@ -30,7 +30,8 @@ public class TagService {
         tagRepository.deleteById(id);
     }
 
-    public boolean existsById(Long id) {
-        return tagRepository.existsById(id);
+    public boolean existsByName(String name) {
+        return tagRepository.existsByName(name);
     }
+    public boolean existsById(Long id){return tagRepository.existsById(id);}
 }

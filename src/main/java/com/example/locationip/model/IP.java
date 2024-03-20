@@ -19,6 +19,6 @@ public class IP {
 
     @ManyToOne
     @JsonIgnoreProperties({"ips","tags"})
-    @JoinColumn(name = "locationId")
+    @JoinColumn(name = "location_id")
     private Location location;
 }

@@ -100,6 +100,9 @@ public class LocationController {
             if (location == null || tag == null) {
                 return ResponseEntity.notFound().build();
             }
+            if(location.getTags().contains(tag)){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Location already has this tag");
+            }
             location.getTags().add(tag);
             tag.getLocations().add(location);
             locationService.saveLocation(location);
@@ -133,7 +136,7 @@ public class LocationController {
             Location location = locationService.getLocationById(locationId);
             Tag tag = tagService.getTagById(tagId);
             if (location == null || tag == null) {
-                return ResponseEntity.notFound().build();
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Not found tag or location");
             }
             location.getTags().remove(tag);
             tag.getLocations().remove(location);

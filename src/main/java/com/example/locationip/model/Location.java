@@ -31,6 +31,6 @@ public class Location {
 
     @JsonIgnoreProperties("locations")
     @ManyToMany(cascade = CascadeType.PERSIST)
-    @JoinTable(name = "locatio_tags", joinColumns = @JoinColumn(name = "location_id"), inverseJoinColumns = @JoinColumn(name = "tags_id"))
+    @JoinTable(name = "location_tags", joinColumns = @JoinColumn(name = "location_id"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
     private List<Tag> tags = new ArrayList<>();
 }
