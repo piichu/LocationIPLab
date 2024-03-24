@@ -2,8 +2,9 @@ package com.example.locationip.controller;
 
 import com.example.locationip.model.Tag;
 import com.example.locationip.service.TagService;
+import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,22 +14,9 @@ import java.util.List;
 public class TagController {
     private final TagService tagService;
 
-    public TagController(TagService tagService) {
+    @Autowired
+    TagController(TagService tagService) {
         this.tagService = tagService;
-    }
-
-    @PostMapping
-    public ResponseEntity<String> createTag(@RequestBody Tag tag) {
-        if (tagService.existsByName(tag.getName())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Tag with the given name already exists.");
-        }
-        tagService.saveTag(tag);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Tag created successfully.");
-    }
-
-    @GetMapping("/{id}")
-    public Tag getTagById(@PathVariable Long id) {
-        return tagService.getTagById(id);
     }
 
     @GetMapping
@@ -36,23 +24,38 @@ public class TagController {
         return tagService.getAllTags();
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<String> updateTag(@PathVariable Long id, @RequestBody Tag tag) {
-        if (!tagService.existsById(id)) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Requested tag don't exist");
-        }
-        Tag oldTag = getTagById(id);
-        tag.setId(id);
-        tag.setLocations(oldTag.getLocations());
-        return ResponseEntity.ok("Tag has been changed");
+    @GetMapping("/{id}")
+    public Tag getTagById(@PathVariable Long id) {
+        return tagService.getTagById(id);
     }
 
+    @Transactional
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping
+    public Long createTag(@RequestParam String name, @RequestBody(required = false) List<Long> locations) {
+        return tagService.createTag(name, locations);
+    }
+
+    @Transactional
+    @ResponseStatus(HttpStatus.OK)
+    @PutMapping("/{id}")
+    public void updateTag(@PathVariable Long id,
+                          @RequestBody(required = false) List<Long> locations,
+                          @RequestParam(required = false) String name) {
+        tagService.updateTag(id, name, locations);
+    }
+
+    @Transactional
+    @ResponseStatus(HttpStatus.OK)
+    @PatchMapping("/addLocation")
+    public void addLocationToTag(@RequestParam Long tagId, @RequestParam Long locationId) {
+        tagService.addLocationToTag(tagId, locationId);
+    }
+
+    @Transactional
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteTag(@PathVariable Long id) {
-        if (!tagService.getTagById(id).getLocations().isEmpty()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Tag is used. Delete only unused tags");
-        }
-        tagService.deleteTag(id);
-        return ResponseEntity.ok("Tag was deleted");
+    public void deleteTag(@PathVariable Long id) {
+        tagService.deleteTagById(id);
     }
 }

@@ -6,19 +6,16 @@ import lombok.*;
 
 @Entity
 @Table(name = "ips")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
 public class IP {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ip_generator")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name = "address")
     private String address;
 
-    @ManyToOne
+    @ManyToOne()
     @JsonIgnoreProperties({"ips","tags"})
-    @JoinColumn(name = "location_id")
+    @JoinColumn(name = "location_id", nullable = false)
     private Location location;
 }

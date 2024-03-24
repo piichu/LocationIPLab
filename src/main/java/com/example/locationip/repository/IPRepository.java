@@ -9,4 +9,6 @@ public interface IPRepository extends JpaRepository<IP, Long> {
     boolean existsByAddress(String address);
 
     IP findByAddress(String address);
+
+    IP getIPById(Long id);
 }

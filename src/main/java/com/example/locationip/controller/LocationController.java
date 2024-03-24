@@ -1,28 +1,23 @@
 package com.example.locationip.controller;
 
-import com.example.locationip.model.IP;
 import com.example.locationip.model.Location;
-import com.example.locationip.model.Tag;
-import com.example.locationip.service.IPService;
 import com.example.locationip.service.LocationService;
-import com.example.locationip.service.TagService;
+import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/locations")
 public class LocationController {
     public final LocationService locationService;
-    public final IPService ipService;
-    public final TagService tagService;
 
-    public LocationController(LocationService locationService, IPService ipService, TagService tagService) {
+    @Autowired
+    public LocationController(LocationService locationService) {
         this.locationService = locationService;
-        this.ipService = ipService;
-        this.tagService = tagService;
     }
 
     @GetMapping
@@ -36,136 +31,54 @@ public class LocationController {
     }
 
     @GetMapping("/ip")
-    public ResponseEntity<Location> getLocationByIP(@RequestParam String address) {
-        Location newLocation = locationService.getLocationByIP(ipService.getIPByAddress(address));
-        if (newLocation == null) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        }
-        return ResponseEntity.ok(newLocation);
+    public Location getLocationByIP(@RequestParam String address) {
+        return locationService.getLocationByIP(address);
     }
 
-    @PostMapping("/linked/{ipId}/{tagId}")
-    public ResponseEntity<String> createLinkedLocation(@RequestBody Location location, @PathVariable Long ipId, @PathVariable Long tagId) {
-        try {
-            Tag tag = tagService.getTagById(tagId);
-            IP ip = ipService.getIPById(ipId);
-            if (tag != null && ip != null) {
-                location.getIps().add(ip);
-                ip.setLocation(location);
-                location.getTags().add(tag);
-                tag.getLocations().add(location);
-                locationService.saveLocation(location);
-                return ResponseEntity.status(HttpStatus.CREATED).body("Location created successfully.");
-            } else {
-                return ResponseEntity.status(HttpStatus.CREATED).body("Bad IP or tag.");
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to add location");
-        }
+    @GetMapping("/tag")
+    public List<Location> getLocationByTag(@RequestParam String name) {
+        return locationService.getLocationByTag(name);
     }
 
+    @Transactional
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping()
-    public ResponseEntity<String> createLocation(@RequestBody Location location) {
-        try {
-            locationService.saveLocation(location);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Location created successfully.");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to add location");
-        }
+    public Long createLocation(@RequestParam String country,
+                               @RequestParam String city,
+                               @RequestBody(required = false) List<Long> tags) {
+        return locationService.createLocation(country, city, tags);
     }
 
-    @PutMapping("/linkIP/{locationId}/{ipId}")
-    public ResponseEntity<String> addIPToLocation(@PathVariable Long locationId, @PathVariable Long ipId) {
-        try {
-            Location location = locationService.getLocationById(locationId);
-            IP ip = ipService.getIPById(ipId);
-            if (location == null || ip == null) {
-                return ResponseEntity.badRequest().body("Invalid location or IP ID");
-            }
-            ip.setLocation(location);
-            location.getIps().add(ip);
-            locationService.saveLocation(location);
-            return ResponseEntity.ok("IP successfully added to location.");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to add ip to location");
-        }
-    }
-
-    @PutMapping("/linkTag/{locationId}/{tagId}")
-    public ResponseEntity<String> addTagToLocation(@PathVariable Long locationId, @PathVariable Long tagId) {
-        try {
-            Location location = locationService.getLocationById(locationId);
-            Tag tag = tagService.getTagById(tagId);
-
-            if (location == null || tag == null) {
-                return ResponseEntity.notFound().build();
-            }
-            if(location.getTags().contains(tag)){
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Location already has this tag");
-            }
-            location.getTags().add(tag);
-            tag.getLocations().add(location);
-            locationService.saveLocation(location);
-            return ResponseEntity.ok("Tag added to location successfully");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to add tag to location");
-        }
-    }
-
-    @PutMapping("/unlinkIP/{locationId}/{ipId}")
-    public ResponseEntity<String> unlinkIP(@PathVariable Long locationId, @PathVariable Long ipId) {
-        try {
-            Location location = locationService.getLocationById(locationId);
-            IP ip = ipService.getIPById(ipId);
-            if (location == null || ip == null) {
-                return ResponseEntity.badRequest().body("Invalid location or IP ID");
-            }
-            ip.setLocation(null);
-            location.getIps().remove(ip);
-            locationService.saveLocation(location);
-            return ResponseEntity.ok("IP successfully unlinked to location.");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to unlink ip to location");
-        }
-
-    }
-
-    @PutMapping("/unlinkTag/{locationId}/{tagId}")
-    public ResponseEntity<String> unlinkTag(@PathVariable Long locationId, @PathVariable Long tagId) {
-        try {
-            Location location = locationService.getLocationById(locationId);
-            Tag tag = tagService.getTagById(tagId);
-            if (location == null || tag == null) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Not found tag or location");
-            }
-            location.getTags().remove(tag);
-            tag.getLocations().remove(location);
-            locationService.saveLocation(location);
-            return ResponseEntity.ok("Tag unlinked to location successfully");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to unlink tag to location");
-        }
-    }
-
+    @Transactional
+    @ResponseStatus(HttpStatus.OK)
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateLocation(@PathVariable Long id, @RequestBody Location location) {
-        if (!locationService.existsById(id)) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Requested location don't exist");
-        }
-        Location oldLocation = locationService.getLocationById(id);
-        location.setId(id);
-        location.setIps(oldLocation.getIps());
-        location.setTags(oldLocation.getTags());
-        locationService.saveLocation(location);
-        return ResponseEntity.ok("Location has been changed");
+    public void updateLocation(@PathVariable Long id,
+                               @RequestParam(required = false) String country,
+                               @RequestParam(required = false) String city,
+                               @RequestBody(required = false) Map<String, List<Long>> ids) {
+        List<Long> ips = ids.get("ips");
+        List<Long> tags = ids.get("tags");
+        locationService.updateLocation(id, country, city, ips, tags);
     }
 
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Transactional
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteLocation(@PathVariable Long id) {
-        if (!locationService.existsById(id)) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Requested locations don't exist");
-        }
-        locationService.deleteLocation(id);
-        return ResponseEntity.ok("Location and linked IP have been deleted");
+    public void deleteLocation(@PathVariable Long id) {
+        locationService.deleteLocationById(id);
+    }
+
+    @Transactional
+    @ResponseStatus(HttpStatus.OK)
+    @PatchMapping("/addIp")
+    public void addIPToLocation(@RequestParam Long locationId, @RequestParam Long ipId) {
+        locationService.addIPToLocation(locationId, ipId);
+    }
+
+    @Transactional
+    @ResponseStatus(HttpStatus.OK)
+    @PatchMapping("/addTag")
+    public void addTagToLocation(@RequestParam Long locationId, @RequestParam Long tagId) {
+        locationService.addTagToLocation(locationId, tagId);
     }
 }
