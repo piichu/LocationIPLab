@@ -16,6 +16,7 @@ public class IPService {
     private final IPRepository ipRepository;
     private final LocationRepository locationRepository;
     private final Cache cache;
+    private static final String CACHE_KEY = "ip-";
 
     @Autowired
     IPService(IPRepository ipRepository, LocationRepository locationRepository, Cache cache) {
@@ -25,11 +26,11 @@ public class IPService {
     }
 
     public IP getIPById(Long id) {
-        if(cache.containsKey("ip-"+id)){
-            return (IP)cache.getFromCache("ip-"+id);
+        if(cache.containsKey(CACHE_KEY+id)){
+            return (IP)cache.getFromCache(CACHE_KEY+id);
         }
         IP ip= ipRepository.findById(id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND));
-        cache.putToCache("ip"+id, ip);
+        cache.putToCache(CACHE_KEY+id, ip);
         return ip;
     }
 
@@ -44,21 +45,21 @@ public class IPService {
             ip.setAddress(address);
             ip.setLocation(locationRepository.getLocationById(locationId));
             ipRepository.save(ip);
-            cache.putToCache("ip-"+ip.getId(), ip);
+            cache.putToCache(CACHE_KEY+ip.getId(), ip);
         } else throw new ResponseStatusException(HttpStatus.CONFLICT);
     }
 
     public void updateIP(Long id, String address, Long locationId) {
         IP ip;
-        if(cache.containsKey("ip-"+id)){
-            ip=(IP) cache.getFromCache("ip-"+id);
+        if(cache.containsKey(CACHE_KEY+id)){
+            ip=(IP) cache.getFromCache(CACHE_KEY+id);
         }else{
             ip=ipRepository.getIPById(id);
         }
         if (address != null) ip.setAddress(address);
         if (locationId != null) ip.setLocation(locationRepository.getLocationById(locationId));
         ipRepository.save(ip);
-        cache.putToCache("ip-"+id,ip);
+        cache.putToCache(CACHE_KEY+id,ip);
     }
 
     public void deleteIPById(Long id) {

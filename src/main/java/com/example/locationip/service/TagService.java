@@ -17,6 +17,7 @@ public class TagService {
     private final TagRepository tagRepository;
     private final LocationRepository locationRepository;
     private final Cache cache;
+    private static final String CACHE_KEY = "tag-";
 
     public TagService(TagRepository tagRepository, LocationRepository locationRepository, Cache cache) {
         this.tagRepository = tagRepository;
@@ -25,11 +26,11 @@ public class TagService {
     }
 
     public Tag getTagById(Long id) {
-        if(cache.containsKey("tag-"+id)){
-            return (Tag) cache.getFromCache("tag"+id);
+        if(cache.containsKey(CACHE_KEY+id)){
+            return (Tag) cache.getFromCache(CACHE_KEY+id);
         }
         Tag tag= tagRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        cache.putToCache("tag-"+id, tag);
+        cache.putToCache(CACHE_KEY+id, tag);
         return tag;
     }
 
@@ -46,14 +47,14 @@ public class TagService {
             }
         }
         tagRepository.save(tag);
-        cache.putToCache("tag-"+tag.getId(), tag);
+        cache.putToCache(CACHE_KEY+tag.getId(), tag);
         return tag.getId();
     }
 
     public void updateTag(Long id, String name, List<Long> locationsIds) {
         Tag tag;
-        if(cache.containsKey("tag-"+id)){
-            tag=(Tag) cache.getFromCache("tag-"+id);
+        if(cache.containsKey(CACHE_KEY+id)){
+            tag=(Tag) cache.getFromCache(CACHE_KEY+id);
         }else {
             tag=tagRepository.getTagById(id);
         }
@@ -66,12 +67,12 @@ public class TagService {
             tag.setLocations(locationList);
         }
         tagRepository.save(tag);
-        cache.putToCache("tag-"+id, tag);
+        cache.putToCache(CACHE_KEY+id, tag);
     }
 
     public void deleteTagById(Long id) {
         tagRepository.deleteById(id);
-        cache.removeFromCache("tag-"+id);
+        cache.removeFromCache(CACHE_KEY+id);
     }
 
     public void addLocationToTag(Long tagId, Long locationId) {
@@ -80,7 +81,7 @@ public class TagService {
         if (location != null && tag != null) {
             tag.getLocations().add(location);
             tagRepository.save(tag);
-            cache.putToCache("tag-"+tagId, tag);
+            cache.putToCache(CACHE_KEY+tagId, tag);
         } else throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
 }
