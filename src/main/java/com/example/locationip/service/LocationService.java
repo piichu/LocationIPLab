@@ -83,6 +83,7 @@ public class LocationService {
             List<IP> ipList = new ArrayList<>();
             for (Long ipsId : ipsIds) {
                 ipList.add(ipRepository.getIPById(ipsId));
+                ipRepository.getIPById(ipsId).setLocation(location);
             }
             location.setIps(ipList);
         }
@@ -106,6 +107,7 @@ public class LocationService {
         IP ip = ipRepository.getIPById(ipId);
         Location location = getLocationById(locationId);
         if (location != null && ip != null) {
+            ip.setLocation(location);
             location.getIps().add(ip);
             locationRepository.save(location);
             cache.putToCache(CACHE_KEY + locationId, location);
