@@ -10,7 +10,12 @@ import java.util.Map;
 @Data
 public class Cache {
 
-    private final Map<String, Object> hashMap = new LinkedHashMap<>();
+    private final Map<String, Object> hashMap = new LinkedHashMap<>(){
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<String, Object> eldest) {
+            return size() > 15;
+        }
+    };
 
     public void putToCache(String key, Object value) {
         hashMap.put(key, value);
