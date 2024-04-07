@@ -46,7 +46,7 @@ public class TagService {
     Tag tag =
         tagRepository
             .findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
     cache.putToCache(CACHE_KEY + id, tag);
     return tag;
   }
@@ -132,7 +132,7 @@ public class TagService {
       tagRepository.save(tag);
       cache.putToCache(CACHE_KEY + tagId, tag);
     } else {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }

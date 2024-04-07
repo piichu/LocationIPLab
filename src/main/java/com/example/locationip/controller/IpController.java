@@ -4,6 +4,7 @@ import com.example.locationip.model.Ip;
 import com.example.locationip.service.IpService;
 import jakarta.transaction.Transactional;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -40,24 +41,26 @@ public class IpController {
   @Transactional
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping
-  public void createIp(@RequestParam String address, @RequestParam Long locationId) {
+  public Long createIp(@RequestParam String address, @RequestParam Long locationId) {
     ipService.createIp(address, locationId);
+    return ipService.getIpByAddress(address).getId();
   }
 
   @Transactional
   @ResponseStatus(HttpStatus.OK)
   @PutMapping("/{id}")
-  public void updateIp(
+  public Long updateIp(
       @PathVariable Long id,
       @RequestParam(required = false) String address,
       @RequestParam(required = false) Long locationId) {
     ipService.updateIp(id, address, locationId);
+    return id;
   }
 
   @Transactional
-  @ResponseStatus(HttpStatus.NO_CONTENT)
   @DeleteMapping("/{id}")
-  public void deleteIp(@PathVariable Long id) {
+  public Long deleteIp(@PathVariable Long id) {
     ipService.deleteIpById(id);
+    return id;
   }
 }

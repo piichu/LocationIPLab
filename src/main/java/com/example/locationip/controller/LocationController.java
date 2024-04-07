@@ -71,7 +71,7 @@ public class LocationController {
   @Transactional
   @ResponseStatus(HttpStatus.OK)
   @PutMapping("/{id}")
-  public void updateLocation(
+  public Long updateLocation(
       @PathVariable Long id,
       @RequestParam(required = false) String country,
       @RequestParam(required = false) String city,
@@ -79,13 +79,14 @@ public class LocationController {
     List<Long> ips = ids.get("ips");
     List<Long> tags = ids.get("tags");
     locationService.updateLocation(id, country, city, ips, tags);
+    return id;
   }
 
-  @ResponseStatus(HttpStatus.NO_CONTENT)
   @Transactional
   @DeleteMapping("/{id}")
-  public void deleteLocation(@PathVariable Long id) {
+  public Long deleteLocation(@PathVariable Long id) {
     locationService.deleteLocationById(id);
+    return id;
   }
 
   @Transactional

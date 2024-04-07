@@ -63,7 +63,7 @@ public class LocationService {
     Location location =
         locationRepository
             .findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
     cache.putToCache(CACHE_KEY + id, location);
     return location;
   }
@@ -179,7 +179,7 @@ public class LocationService {
       locationRepository.save(location);
       cache.putToCache(CACHE_KEY + locationId, location);
     } else {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 

@@ -50,11 +50,12 @@ public class TagController {
   @Transactional
   @ResponseStatus(HttpStatus.OK)
   @PutMapping("/{id}")
-  public void updateTag(
+  public Long updateTag(
       @PathVariable Long id,
       @RequestBody(required = false) List<Long> locations,
       @RequestParam(required = false) String name) {
     tagService.updateTag(id, name, locations);
+    return id;
   }
 
   @Transactional
@@ -65,9 +66,9 @@ public class TagController {
   }
 
   @Transactional
-  @ResponseStatus(HttpStatus.NO_CONTENT)
   @DeleteMapping("/{id}")
-  public void deleteTag(@PathVariable Long id) {
+  public Long deleteTag(@PathVariable Long id) {
     tagService.deleteTagById(id);
+    return id;
   }
 }

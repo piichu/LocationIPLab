@@ -38,9 +38,13 @@ public class IpService {
     Ip ip =
         ipRepository
             .findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
     cache.putToCache(CACHE_KEY + id, ip);
     return ip;
+  }
+
+  public Ip getIpByAddress(String address) {
+    return ipRepository.findByAddress(address);
   }
 
   public List<Ip> getAllIps() {
@@ -62,7 +66,7 @@ public class IpService {
       ipRepository.save(ip);
       cache.putToCache(CACHE_KEY + ip.getId(), ip);
     } else {
-      throw new ResponseStatusException(HttpStatus.CONFLICT);
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
