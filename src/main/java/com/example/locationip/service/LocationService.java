@@ -5,6 +5,7 @@ import com.example.locationip.model.Ip;
 import com.example.locationip.model.Location;
 import com.example.locationip.model.Tag;
 import com.example.locationip.repository.IpRepository;
+import com.example.locationip.repository.LocationDto;
 import com.example.locationip.repository.LocationRepository;
 import com.example.locationip.repository.TagRepository;
 import java.util.ArrayList;
@@ -39,6 +40,29 @@ public class LocationService {
     this.ipRepository = ipRepository;
     this.tagRepository = tagRepository;
     this.cache = cache;
+  }
+
+  private Location convertToLocation(LocationDto locationDto) {
+    Location location = new Location();
+    location.setCountry(locationDto.country());
+    location.setCity(locationDto.city());
+
+    List<Tag> tags = tagRepository.findAllById(locationDto.tags());
+    location.setTags(tags);
+
+    return location;
+  }
+
+  /**
+   * Create locations list.
+   *
+   * @param locationDtos the location dtos
+   * @return the list
+   */
+  public List<Long> createLocations(List<LocationDto> locationDtos) {
+    List<Location> locations = locationDtos.stream().map(this::convertToLocation).toList();
+    locationRepository.saveAll(locations);
+    return locations.stream().map(Location::getId).toList();
   }
 
   /**

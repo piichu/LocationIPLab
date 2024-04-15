@@ -1,6 +1,7 @@
 package com.example.locationip.controller;
 
 import com.example.locationip.model.Location;
+import com.example.locationip.repository.LocationDto;
 import com.example.locationip.service.LocationService;
 import jakarta.transaction.Transactional;
 import java.util.List;
@@ -58,6 +59,13 @@ public class LocationController {
       @RequestParam String city,
       @RequestBody(required = false) List<Long> tags) {
     return locationService.createLocation(country, city, tags);
+  }
+
+  @ResponseStatus(HttpStatus.CREATED)
+  @Transactional
+  @PostMapping("/several")
+  public List<Long> createSeveralLocations(@RequestBody List<LocationDto> locations) {
+    return locationService.createLocations(locations);
   }
 
   /**
