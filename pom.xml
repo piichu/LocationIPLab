@@ -17,6 +17,7 @@
         <java.version>17</java.version>
         <sonar.organization>piichu</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.coverage.jacoco.xmlReportPaths>target/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     </properties>
     <dependencies>
 
@@ -86,7 +87,6 @@
 
     <build>
         <plugins>
-            
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
