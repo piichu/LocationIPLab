@@ -14,7 +14,7 @@
     <name>LocationIP</name>
     <description>LocationIP</description>
     <properties>
-        <java.version>21</java.version>
+        <java.version>17</java.version>
         <sonar.organization>piichu</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
