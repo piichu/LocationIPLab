@@ -11,6 +11,7 @@ import com.example.locationip.repository.TagRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -43,14 +44,21 @@ public class LocationService {
     this.cache = cache;
   }
 
-  private Location convertToLocation(LocationDto locationDto) {
+  /**
+   * Convert to location location.
+   *
+   * @param locationDto the location dto
+   * @return the location
+   */
+  public Location convertToLocation(LocationDto locationDto) {
     Location location = new Location();
-    location.setCountry(locationDto.country());
-    location.setCity(locationDto.city());
+    if (locationDto != null) {
+      location.setCountry(locationDto.country());
+      location.setCity(locationDto.city());
 
-    List<Tag> tags = tagRepository.findAllById(locationDto.tags());
-    location.setTags(tags);
-
+      List<Tag> tags = tagRepository.findAllById(locationDto.tags());
+      location.setTags(tags);
+    }
     return location;
   }
 
@@ -85,12 +93,14 @@ public class LocationService {
     if (cache.containsKey(CACHE_KEY + id)) {
       return (Location) cache.getFromCache(CACHE_KEY + id);
     }
-    Location location =
-        locationRepository
-            .findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
-    cache.putToCache(CACHE_KEY + id, location);
-    return location;
+    Optional<Location> location = locationRepository.findById(id);
+    if (location.isPresent()) {
+      Location location1 = location.get();
+      cache.putToCache(CACHE_KEY + id, location1);
+
+      return location1;
+    }
+    return null;
   }
 
   /**
