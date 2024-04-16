@@ -10,6 +10,7 @@ import com.example.locationip.repository.LocationRepository;
 import com.example.locationip.repository.TagRepository;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -142,11 +143,9 @@ public class LocationService {
    * @param id the id
    * @param country the country
    * @param city the city
-   * @param ipsIds the ips ids
-   * @param tagsIds the tags ids
+   * @param ids the ids
    */
-  public void updateLocation(
-      Long id, String country, String city, List<Long> ipsIds, List<Long> tagsIds) {
+  public Long updateLocation(Long id, String country, String city, Map<String, List<Long>> ids) {
     Location location;
     if (cache.containsKey(CACHE_KEY + id)) {
       location = (Location) cache.getFromCache(CACHE_KEY + id);
@@ -159,23 +158,26 @@ public class LocationService {
     if (city != null) {
       location.setCity(city);
     }
-    if (!ipsIds.isEmpty()) {
+    List<Long> ips = ids.get("ips");
+    if (!ips.isEmpty()) {
       List<Ip> ipList = new ArrayList<>();
-      for (Long ipsId : ipsIds) {
+      for (Long ipsId : ips) {
         ipList.add(ipRepository.getIpById(ipsId));
         ipRepository.getIpById(ipsId).setLocation(location);
       }
       location.setIps(ipList);
     }
-    if (!tagsIds.isEmpty()) {
+    List<Long> tags = ids.get("tags");
+    if (!tags.isEmpty()) {
       List<Tag> tagList = new ArrayList<>();
-      for (Long tagsId : tagsIds) {
+      for (Long tagsId : tags) {
         tagList.add(tagRepository.getTagById(tagsId));
       }
       location.setTags(tagList);
     }
     locationRepository.save(location);
     cache.putToCache(CACHE_KEY + id, location);
+    return location.getId();
   }
 
   /**

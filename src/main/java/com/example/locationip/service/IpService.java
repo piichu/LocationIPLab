@@ -84,18 +84,20 @@ public class IpService {
     } else {
       ip = ipRepository.getIpById(id);
     }
-    if (address != null) {
-      ip.setAddress(address);
+    if (ip != null) {
+      if (address != null) {
+        ip.setAddress(address);
+      }
+      if (locationId != null) {
+        ip.setLocation(locationRepository.getLocationById(locationId));
+      }
+      ipRepository.save(ip);
+      cache.putToCache(CACHE_KEY + id, ip);
     }
-    if (locationId != null) {
-      ip.setLocation(locationRepository.getLocationById(locationId));
-    }
-    ipRepository.save(ip);
-    cache.putToCache(CACHE_KEY + id, ip);
   }
 
   public void deleteIpById(Long id) {
     ipRepository.deleteById(id);
-    cache.removeFromCache("ip-" + id);
+    cache.removeFromCache(CACHE_KEY + id);
   }
 }

@@ -84,10 +84,8 @@ public class LocationController {
       @RequestParam(required = false) String country,
       @RequestParam(required = false) String city,
       @RequestBody(required = false) Map<String, List<Long>> ids) {
-    List<Long> ips = ids.get("ips");
-    List<Long> tags = ids.get("tags");
-    locationService.updateLocation(id, country, city, ips, tags);
-    return id;
+
+    return locationService.updateLocation(id, country, city, ids);
   }
 
   @Transactional
