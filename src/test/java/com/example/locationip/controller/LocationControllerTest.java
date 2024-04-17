@@ -9,7 +9,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -17,9 +16,14 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class LocationControllerTest {
   @InjectMocks private LocationController locationController;
@@ -33,7 +37,7 @@ class LocationControllerTest {
   @Test
   void testConstructor() {
     locationService.getAllLocations();
-    Mockito.verify(locationService).getAllLocations();
+    verify(locationService).getAllLocations();
   }
 
   @Test
@@ -42,7 +46,7 @@ class LocationControllerTest {
         Arrays.asList(
             new Location(1L, "Spain", "Madrid", null, null),
             new Location(2L, "Spain", "Sevil", null, null));
-    Mockito.when(locationService.getAllLocations()).thenReturn(locations);
+    when(locationService.getAllLocations()).thenReturn(locations);
     List<Location> result = locationController.getAllLocations();
     assertEquals(locations, result);
   }
@@ -50,7 +54,7 @@ class LocationControllerTest {
   @Test
   void testGetLocationById() {
     Location location = new Location(1L, "", "", null, null);
-    Mockito.when(locationService.getLocationById(1L)).thenReturn(location);
+    when(locationService.getLocationById(1L)).thenReturn(location);
     Location result = locationController.getLocationById(1L);
     assertEquals(location, result);
   }
@@ -62,7 +66,7 @@ class LocationControllerTest {
     String address = "1.1.1.1";
     ip.setAddress(address);
     location.getIps().add(ip);
-    Mockito.when(locationService.getLocationByIp(address)).thenReturn(location);
+    when(locationService.getLocationByIp(address)).thenReturn(location);
     Location result = locationController.getLocationByIp(address);
     assertEquals(result, location);
   }
@@ -76,7 +80,7 @@ class LocationControllerTest {
     locations.get(0).getTags().add(tag);
     locations.get(1).getTags().add(new Tag());
     locations.get(2).getTags().add(tag);
-    Mockito.when(locationService.getLocationByTag(name)).thenReturn(locations);
+    when(locationService.getLocationByTag(name)).thenReturn(locations);
     List<Location> result = locationController.getLocationByTag(name);
     assertEquals(result, locations);
   }
@@ -84,7 +88,7 @@ class LocationControllerTest {
   @Test
   void testCreateLocation() {
     Long locationId = 1L;
-    Mockito.when(locationService.createLocation("", "", null)).thenReturn(locationId);
+    when(locationService.createLocation("", "", null)).thenReturn(locationId);
     Long result = locationController.createLocation("", "", null);
     assertEquals(result, locationId);
   }
@@ -94,7 +98,7 @@ class LocationControllerTest {
     List<Long> ids = Arrays.asList(1L, 2L);
     List<LocationDto> locationDtos =
         Arrays.asList(new LocationDto("", "", null), new LocationDto("2", "2", null));
-    Mockito.when(locationService.createLocations(locationDtos)).thenReturn(ids);
+    when(locationService.createLocations(locationDtos)).thenReturn(ids);
     List<Long> result = locationController.createSeveralLocations(locationDtos);
     assertEquals(result, ids);
   }
@@ -105,15 +109,39 @@ class LocationControllerTest {
     String country = "Spain";
     String city = "Madrid";
 
-    Mockito.when(
-            locationService.updateLocation(
-                any(Long.class), any(String.class), any(String.class), anyMap()))
+    when(locationService.updateLocation(
+            any(Long.class), any(String.class), any(String.class), anyMap()))
         .thenReturn(locationId);
-
     try {
       locationController.updateLocation(locationId, country, city, null);
     } catch (ResponseStatusException ex) {
       assertEquals(HttpStatus.CREATED, ex.getStatusCode());
     }
+  }
+
+  @Test
+  void testDeleteLocation() {
+    Long locationId = 1L;
+    Long result = locationController.deleteLocation(locationId);
+    verify(locationService, times(1)).deleteLocationById(locationId);
+    assertEquals(locationId, result);
+  }
+
+  @Test
+  void testAddIpToLocation() {
+    Long locationId = 1L;
+    Long ipId = 2L;
+    doNothing().when(locationService).addIpToLocation(locationId, ipId);
+    assertDoesNotThrow(() -> locationController.addIpToLocation(locationId, ipId));
+    verify(locationService, times(1)).addIpToLocation(locationId, ipId);
+  }
+
+  @Test
+  void testAddTagToLocation() {
+    Long locationId = 1L;
+    Long tagId = 2L;
+    doNothing().when(locationService).addTagToLocation(locationId, tagId);
+    assertDoesNotThrow(() -> locationController.addTagToLocation(locationId, tagId));
+    verify(locationService, times(1)).addTagToLocation(locationId, tagId);
   }
 }
