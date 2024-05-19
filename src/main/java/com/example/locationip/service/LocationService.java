@@ -168,25 +168,27 @@ public class LocationService {
     if (city != null) {
       location.setCity(city);
     }
-    List<Long> ips = ids.get("ips");
-    if (!ips.isEmpty()) {
-      List<Ip> ipList = new ArrayList<>();
-      for (Long ipsId : ips) {
-        ipList.add(ipRepository.getIpById(ipsId));
-        ipRepository.getIpById(ipsId).setLocation(location);
+    if (ids != null) {
+      List<Long> ips = ids.get("ips");
+      if (!ips.isEmpty()) {
+        List<Ip> ipList = new ArrayList<>();
+        for (Long ipsId : ips) {
+          ipList.add(ipRepository.getIpById(ipsId));
+          ipRepository.getIpById(ipsId).setLocation(location);
+        }
+        location.setIps(ipList);
       }
-      location.setIps(ipList);
-    }
-    List<Long> tags = ids.get("tags");
-    if (!tags.isEmpty()) {
-      List<Tag> tagList = new ArrayList<>();
-      for (Long tagsId : tags) {
-        tagList.add(tagRepository.getTagById(tagsId));
+      List<Long> tags = ids.get("tags");
+      if (!tags.isEmpty()) {
+        List<Tag> tagList = new ArrayList<>();
+        for (Long tagsId : tags) {
+          tagList.add(tagRepository.getTagById(tagsId));
+        }
+        location.setTags(tagList);
       }
-      location.setTags(tagList);
     }
     locationRepository.save(location);
-    cache.putToCache(CACHE_KEY + id, location);
+    cache.removeFromCache(CACHE_KEY + id);
     return location.getId();
   }
 
@@ -229,9 +231,24 @@ public class LocationService {
     Tag tag = tagRepository.getTagById(tagId);
     Location location = getLocationById(locationId);
     if (location != null && tag != null) {
-      tag.getLocations().add(location);
+      if (!location.getTags().contains(tag)) {
+        tag.getLocations().add(location);
+        locationRepository.save(location);
+        cache.removeFromCache(CACHE_KEY + locationId);
+      }
+    } else {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+    }
+  }
+
+  public void deleteTagFromLocation(Long locationId, Long tagId) {
+    Tag tag = tagRepository.getTagById(tagId);
+    Location location = getLocationById(locationId);
+    if (location != null && tag != null) {
+      location.getTags().remove(tag);
+      tag.getLocations().remove(location);
       locationRepository.save(location);
-      cache.putToCache(CACHE_KEY + locationId, location);
+      cache.removeFromCache(CACHE_KEY + locationId);
     } else {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }

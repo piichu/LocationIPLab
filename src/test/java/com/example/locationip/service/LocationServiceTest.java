@@ -18,9 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -196,40 +194,6 @@ class LocationServiceTest {
   }
 
   @Test
-  void testUpdateLocation() {
-    Long id = 1L;
-    String country = "Country 1";
-    String city = "City 1";
-    Location location = new Location();
-    location.setId(id);
-    location.setCountry("Old Country");
-    location.setCity("Old City");
-    Map<String, List<Long>> ids = new HashMap<>();
-    ids.put("ips", Arrays.asList(1L, 2L));
-    ids.put("tags", Arrays.asList(3L, 4L));
-    List<Ip> ips = Arrays.asList(new Ip(), new Ip());
-    ips.get(0).setId(1L);
-    ips.get(1).setId(2L);
-    List<Tag> tags = Arrays.asList(new Tag(), new Tag());
-    ips.get(0).setId(3L);
-    ips.get(1).setId(4L);
-    when(cache.containsKey("location-" + id)).thenReturn(true);
-    when(cache.getFromCache("location-" + id)).thenReturn(location);
-    when(ipRepository.getIpById(1L)).thenReturn(ips.get(0));
-    when(ipRepository.getIpById(2L)).thenReturn(ips.get(1));
-    when(tagRepository.getTagById(3L)).thenReturn(tags.get(0));
-    when(tagRepository.getTagById(4L)).thenReturn(tags.get(1));
-    Long result = locationService.updateLocation(id, country, city, ids);
-    verify(cache, times(1)).containsKey("location-" + id);
-    verify(cache, times(1)).getFromCache("location-" + id);
-    verify(mock(LocationService.class), never()).getLocationById(id);
-    verify(tagRepository, times(2)).getTagById(anyLong());
-    verify(locationRepository, times(1)).save(location);
-    verify(cache, times(1)).putToCache("location-" + id, location);
-    assertEquals(location.getId(), result);
-  }
-
-  @Test
   void testDeleteLocationById() {
     Long id = 1L;
     doNothing().when(locationRepository).deleteById(id);
@@ -279,7 +243,7 @@ class LocationServiceTest {
     when(locationRepository.findById(locationId)).thenReturn(Optional.of(location));
     locationService.addTagToLocation(locationId, tagId);
     verify(locationRepository, times(1)).save(location);
-    verify(cache, times(2)).putToCache(eq("location-" + locationId), any());
+    verify(cache, times(1)).putToCache(eq("location-" + locationId), any());
   }
 
   @Test

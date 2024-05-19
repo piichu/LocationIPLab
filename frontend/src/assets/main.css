@@ -1,0 +1,17 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+body{
+    background: rgb(157,154,203);
+    background: linear-gradient(93deg, rgba(157,154,203,0.918732458803834) 2%, rgba(137,206,237,1) 75%);
+}
+@font-face {
+    font-family: 'VAG World Bold';
+    src: url('../fonts/vag_world_bold.eot'); /* IE 9 Compatibility Mode */
+    src: url('../fonts/vag_world_bold.eot?#iefix') format('embedded-opentype'), /* IE < 9 */
+    url('../fonts/vag_world_bold.woff2') format('woff2'), /* Super Modern Browsers */
+    url('../fonts/vag_world_bold.woff') format('woff'), /* Firefox >= 3.6, any other modern browser */
+    url('../fonts/vag_world_bold.ttf') format('truetype'), /* Safari, Android, iOS */
+    url('../fonts/vag_world_bold.svg#vag_world_bold') format('svg'); /* Chrome < 4, Legacy iOS */
+}

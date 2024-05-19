@@ -2,10 +2,10 @@ package com.example.locationip.component;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/** The type Cache test. */
 class CacheTest {
 
   private Cache cache;

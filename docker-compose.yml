@@ -1,0 +1,46 @@
+version: '3.9'
+
+services:
+  postgresdb:
+    image: postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=parolotsql
+      - POSTGRES_DB=locations
+    ports:
+      - "5432:5432"
+    volumes:
+      - db:/var/lib/postgres
+
+  app:
+    depends_on:
+      - postgresdb
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: on-failure
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_APPLICATION_JSON: '{
+        "spring.datasource.url"  : "jdbc:postgresql://postgresdb:5432/locations",
+        "spring.datasource.username" : "postgres",
+        "spring.datasource.password" : "parolotsql",
+        "spring.jpa.properties.hibernate.dialect" : "org.hibernate.dialect.PostgreSQLDialect",
+        "spring.jpa.hibernate.ddl-auto" : "update"
+      }'
+  vue:
+    container_name: front
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    depends_on:
+      - app
+    volumes:
+      - './frontend:/app'
+      - '/app/node_modules'
+volumes:
+  db:

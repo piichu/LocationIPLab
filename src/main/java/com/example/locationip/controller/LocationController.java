@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /** The type Location controller. */
 @RestController
+@CrossOrigin
 @RequestMapping("/locations")
 public class LocationController {
   public final LocationService locationService;
@@ -107,5 +109,12 @@ public class LocationController {
   @PatchMapping("/addTag")
   public void addTagToLocation(@RequestParam Long locationId, @RequestParam Long tagId) {
     locationService.addTagToLocation(locationId, tagId);
+  }
+
+  @Transactional
+  @ResponseStatus(HttpStatus.OK)
+  @PatchMapping("/removeTag")
+  public void removeTagFromLocation(@RequestParam Long locationId, @RequestParam Long tagId) {
+    locationService.deleteTagFromLocation(locationId, tagId);
   }
 }
