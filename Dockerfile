@@ -1,10 +1,12 @@
-FROM maven:3.8.4-openjdk-17 AS builder
-WORKDIR /app
-COPY . /app/.
-RUN mvn -f /app/pom.xml clean package -Dmaven.test.skip=true
+# 1. Building the App with Maven
+FROM maven:3.8.3-openjdk-17
 
-FROM openjdk:17.0.1-jdk-slim
-WORKDIR /app
-COPY --from=builder /app/target/*.jar /app/*.jar
-EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "/app/*.jar"]
+ADD . /LocationIP
+WORKDIR /LocationIP
+
+# Run Maven build
+RUN mvn clean install
+
+FROM openjdk:17.0.2-jdk
+COPY --from=0 "/LocationIP/backend/target/backend-0.0.1-SNAPSHOT.jar" app.jar
+ENTRYPOINT [ "sh", "-c", "java -jar /app.jar" ]

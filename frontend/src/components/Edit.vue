@@ -75,6 +75,7 @@
         </div>
       </li>
     </ul>
+    <button @click="goHome"></button>
   </div>
 </template>
 
@@ -191,7 +192,7 @@ export default {
     toggleTagDropdown(locationId) {
       if (this.addingTag !== locationId) {
         this.addingTag = locationId
-      }else{
+      } else {
         this.addTag(locationId)
       }
     },
@@ -240,6 +241,9 @@ export default {
       this.editingCity = null;
       this.editingCityName = '';
       this.fetchLocations();
+    },
+    goHome() {
+      this.$router.push('/')
     }
 
   }

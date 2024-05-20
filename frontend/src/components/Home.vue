@@ -43,8 +43,11 @@ export default {
         }
       })
     },
-    goToTags(){
+    goToTags() {
       this.$router.push('/tags')
+    },
+    goToEdit() {
+      this.$router.push('/edit')
     }
   }
 
@@ -53,6 +56,7 @@ export default {
 
 <template>
   <button class="top-right" @click="goToTags">Тэги</button>
+  <button class="aaa" @click="goToEdit"></button>
   <div class="wrapper">
     <div class="planet">
       <img src="../assets/planet-earth-global-svgrepo-com.svg" alt="Planet Image">
@@ -154,9 +158,22 @@ button:hover {
   margin-bottom: 5px;
 }
 
-.top-right{
+.top-right {
   position: fixed;
   top: 20px;
   right: 20px;
+}
+
+.aaa {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  opacity: 0;
 }
 </style>
